@@ -1,8 +1,7 @@
 <?php
-config();
+bootstrap();
 
-//$x = 42/0;
-throw new Exception("Error Processing Request", 500);
+render('template', array('body' => '<h1>hello world!</h1>'));
 
 
 //___________________________________________________________________________________________
@@ -51,6 +50,28 @@ function error_handler($num, $str, $file, $line, $ctx) {
 	$err_msg = DEBUG ? "Error# $num<br/>$str<br/>file: $file on line# $line<br>in context:<pre>".print_r($ctx, true)."</pre>" : "Sorry, an error has occured.";
     render("template", array("body" => "<h1>Error!</h1><p>$err_msg</p>"));
     die();
+}
+//___________________________________________________________________________________________
+//                                                                                   app init
+/**
+ * bootstrap
+ * initilizes the application
+ */
+function bootstrap() {
+	config();
+	testBlobs();
+}
+/**
+ * test blobs
+ * tests to see if the blobs directory exists and is writable
+ */
+function testBlobs() {
+	if(!is_dir(BLOBS)) {
+		throw new Exception("blobs directory not found!", 500);
+	}
+	if(!is_writable(BLOBS)) {
+		throw new Exception("blobs directory is not writable!", 500);
+	}
 }
 //___________________________________________________________________________________________
 //                                                                                  rendering
