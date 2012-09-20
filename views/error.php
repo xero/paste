@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>paste</title>
+		<title>paste - error!</title>
 		<style type="text/css">
 			*, html {
 				margin: 0px;
@@ -79,7 +79,11 @@
 		</div>
 		<br class="clear"/>
 		<div id="content">
-			<?=$body; ?>
+			<h1>Error!</h1>
+			<div id="viewPaste"><?=$msg; ?></div>
+			<form name="pasteForm" id="pasteForm" method="post" action="?/new/">
+				<input type="submit" name="button" id="button" value="new" />
+			</form>
 		</div>
 	</body>
 </html>

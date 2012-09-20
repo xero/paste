@@ -1,7 +1,10 @@
 <?php
 bootstrap();
 
-render('template', array('body' => '<h1>hello world!</h1>'));
+
+$form = render('form', array('url' => '?/save/'), true);
+$viewit = render('paste', array('paste' => 'here is some sample data.'), true);
+render('template', array('body' => $viewit));
 
 
 //___________________________________________________________________________________________
@@ -31,9 +34,7 @@ function config() {
 function exception_handler($exc) {
     $code = $exc->getCode();
     $msg = $exc->getMessage();
-    $exc_msg = DEBUG ? "Exception# $code<br/>$msg" : "Sorry, an exception has occured.";
-    
-    render("template", array("body" => "<h1>Error!</h1><p>$exc_msg</p>"));
+    render("error", array("msg" => DEBUG ? "Exception# $code<br/>$msg" : "Sorry, an exception has occured."));
     die();
 }
 /**
@@ -47,8 +48,7 @@ function exception_handler($exc) {
  * @param array $ctx the context of the error
  */
 function error_handler($num, $str, $file, $line, $ctx) {
-	$err_msg = DEBUG ? "Error# $num<br/>$str<br/>file: $file on line# $line<br>in context:<pre>".print_r($ctx, true)."</pre>" : "Sorry, an error has occured.";
-    render("template", array("body" => "<h1>Error!</h1><p>$err_msg</p>"));
+    render("error", array("msg" => DEBUG ? "Error# $num<br/>$str<br/>File: $file <br/>Line: $line" : "Sorry, an error has occured."));
     die();
 }
 //___________________________________________________________________________________________
@@ -77,18 +77,27 @@ function testBlobs() {
 //                                                                                  rendering
 /**
  * render
- * generated the pages and renders it to the user
+ * simple html template function.
  *
  * @param string $view the filename of the template to load (without extension)
  * @param array $data the data to be inserted into the view
+ * @param boolean $return if true the html will be returned, otherwise rendered to the screen
  */
-function render($view, $data) {
+function render($view, $data, $return = false) {
 	if(sizeof($data) > 0)
         extract($data, EXTR_SKIP);
 
 	$file = VIEWS.$view.".php";
 	if(file_exists($file)) {
-    	include($file);
+		if($return) {
+	        ob_start();
+	        include($file);
+	        $content = ob_get_contents();
+	        ob_end_clean();
+	        return $content;
+		} else {
+    		include($file);
+    	}
     } else {
     	throw new Exception("unable to load template: $file", 500);
     }
