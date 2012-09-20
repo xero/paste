@@ -79,7 +79,7 @@
 		</div>
 		<br class="clear"/>
 		<div id="content">
-			<?=$body; ?>
+			<? echo $body; ?>
 		</div>
 	</body>
 </html>

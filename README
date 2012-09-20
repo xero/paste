@@ -1,0 +1,4 @@
+paste is a simple web application for storing text online. all data stored on the sever is encrypted. and when creating your paste, you are provided with the only decryption key via sharing url. if you loose your url, you loose your decryption key. we do not store them on the server. this keeps liability down for us, and security up for you. urls are not indexed, so search engines (and hackers) cannot spider them.
+
+install notes:
+- make sure the /blobs/ directory is writable.

@@ -1,4 +1,4 @@
-<form name="pasteForm" id="pasteForm" method="post" action="<?=$url; ?>">
+<form name="pasteForm" id="pasteForm" method="post" action="<? echo $url; ?>">
 	<h1>create paste</h1>
 	<input type="submit" name="button" id="button" value="save" />
 	<select name="ttl" id="ttl">

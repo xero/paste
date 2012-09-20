@@ -80,7 +80,7 @@
 		<br class="clear"/>
 		<div id="content">
 			<h1>Error!</h1>
-			<div id="viewPaste"><?=$msg; ?></div>
+			<div id="viewPaste"><? echo $msg; ?></div>
 			<form name="pasteForm" id="pasteForm" method="post" action="?/new/">
 				<input type="submit" name="button" id="button" value="new" />
 			</form>

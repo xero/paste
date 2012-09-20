@@ -3,8 +3,8 @@ bootstrap();
 
 
 $form = render('form', array('url' => '?/save/'), true);
-$viewit = render('paste', array('paste' => 'here is some sample data.'), true);
-render('template', array('body' => $viewit));
+//$viewit = render('paste', array('paste' => 'here is some sample data.'), true);
+render('template', array('body' => $form));
 
 
 //___________________________________________________________________________________________
