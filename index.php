@@ -1,8 +1,8 @@
 <?php
 config();
 
-$x = 42/0;
-throw new Exception("Error Processing Request", 1);
+//$x = 42/0;
+throw new Exception("Error Processing Request", 500);
 
 
 //___________________________________________________________________________________________
@@ -33,7 +33,9 @@ function exception_handler($exc) {
     $code = $exc->getCode();
     $msg = $exc->getMessage();
     $exc_msg = DEBUG ? "Exception# $code<br/>$msg" : "Sorry, an exception has occured.";
-    die("<h1>Error!</h1><p>$exc_msg</p>");
+    
+    render("template", array("body" => "<h1>Error!</h1><p>$exc_msg</p>"));
+    die();
 }
 /**
  * error handler
@@ -47,8 +49,28 @@ function exception_handler($exc) {
  */
 function error_handler($num, $str, $file, $line, $ctx) {
 	$err_msg = DEBUG ? "Error# $num<br/>$str<br/>file: $file on line# $line<br>in context:<pre>".print_r($ctx, true)."</pre>" : "Sorry, an error has occured.";
-    die("<h1>Error!</h1><p>$err_msg</p>");
+    render("template", array("body" => "<h1>Error!</h1><p>$err_msg</p>"));
+    die();
 }
+//___________________________________________________________________________________________
+//                                                                                  rendering
+/**
+ * render
+ * generated the pages and renders it to the user
+ *
+ * @param string $view the filename of the template to load (without extension)
+ * @param array $data the data to be inserted into the view
+ */
+function render($view, $data) {
+	if(sizeof($data) > 0)
+        extract($data, EXTR_SKIP);
 
+	$file = VIEWS.$view.".php";
+	if(file_exists($file)) {
+    	include($file);
+    } else {
+    	throw new Exception("unable to load template: $file", 500);
+    }
+}
 
 ?>
