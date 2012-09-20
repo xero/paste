@@ -10,5 +10,5 @@
 		<option value="0">never</option>
 	</select>
 	<br class="clear"/>
-	<textarea></textarea>
+	<textarea name="data"></textarea>
 </form>

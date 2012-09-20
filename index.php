@@ -1,12 +1,5 @@
 <?php
 bootstrap();
-
-
-$form = render('form', array('url' => '?/save/'), true);
-//$viewit = render('paste', array('paste' => 'here is some sample data.'), true);
-render('template', array('body' => $form));
-
-
 //___________________________________________________________________________________________
 //                                                                          app configuration
 /**
@@ -60,6 +53,8 @@ function error_handler($num, $str, $file, $line, $ctx) {
 function bootstrap() {
 	config();
 	testBlobs();
+	$url = URLdecoder();
+	URLlogic($url);
 }
 /**
  * test blobs
@@ -72,6 +67,117 @@ function testBlobs() {
 	if(!is_writable(BLOBS)) {
 		throw new Exception("blobs directory is not writable!", 500);
 	}
+}
+//___________________________________________________________________________________________
+//                                                                                 url mining
+/**
+ * URL decoder
+ * defines url related variables.
+ * BASE_URL  : the server root url
+ * RAW_URL   : the actual url entered
+ * CLEAN_URL : the raw url minus the querystring
+ * DIRTY     : a boolean of whether the querystring exists
+ * 
+ * @return array $url clean url values
+ */
+function URLdecoder() {
+	define("BASE_URL",		strtolower("http://".dirname($_SERVER["HTTP_HOST"].$_SERVER["SCRIPT_NAME"])."/"));
+	define("RAW_URL",		strtolower(cleanExtraction("http://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"], false)));
+	define("CLEAN_URL",		strtolower(cleanExtraction("http://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"], true)));
+	define("DIRTY",			checkCleanliness(RAW_URL));
+	define("DOMAIN",		DIRTY ? BASE_URL."?/" : BASE_URL);
+
+	$url = explode(BASE_URL, CLEAN_URL);
+	if(isset($url[1])) {
+		$url = @explode("/", $url[1]);
+	} else {
+		$url[0] = "";
+	}
+	return $url;
+}
+/**
+ * the clean extraction function takes a raw url and
+ * removes both leading and trailing slashes, the
+ * root file name (index.php) and the query string
+ * question mark and trailing slash.
+ *
+ * @param string $url
+ * @param boolean $clean 
+ * @return string
+ */
+function cleanExtraction($url, $clean) {
+	if($clean) $url = str_replace("?/", "", $url);
+	if ('/' == substr($url, 0, 1)) $url = substr_replace($url, '', 0, 1); 
+	if ('/' == substr($url, strlen($url)-1)) $url = substr_replace($url, '', strlen($url)-1); 
+	return str_replace("index.php", "", $url);
+}
+/**
+ * the check cleanliness function returns a boolean
+ * depending on the existance of the query string.
+ *
+ * @param string $url
+ * @return booleans
+ */
+function checkCleanliness($url) {
+	if(FORCE_DIRTY) {
+		return true;
+	} else {
+		return substr_count($url, "?")>0 ? true : false;
+	}
+}
+function URLlogic($url) {
+	if(!is_array($url)) {
+		throw new Exception("failed to decode url array", 500);
+	}
+	if(!isset($url[0])) {
+		//---welcome screen
+		render('template', array('body' => render('main', array('url' => DOMAIN.'new/'), true)));
+	} else {
+		if($url[0] === '') {
+			//---welcome screen
+			render('template', array('body' => render('main', array('url' => DOMAIN.'new/'), true)));
+		} else if($url[0] == 'new') {
+			//---create paste form
+			$form = render('form', array('url' => DOMAIN.'save/'), true);
+			render('template', array('body' => $form));			
+		} else if($url[0] == 'save') {
+			//---save paste
+			$ttl = getRequest('ttl', FILTER_SANITIZE_NUMBER_INT);
+			$data = getRequest('data', FILTER_SANITIZE_SPECIAL_CHARS);
+			/**
+			 * @todo decide how to encode file w/ ttl and data, encrypt, save, generate url, and respond.
+			 */
+			$form = render('paste', array('url' => DOMAIN.'new/', 'paste' => 'coming soon...'), true);
+			render('template', array('body' => $form));
+		} else {
+			throw new Exception("Invalid URL", 404);
+		}
+	}
+}
+//___________________________________________________________________________________________
+//                                                                              save routines
+/**
+ * get request
+ * function for securely dealing with post data by calling filter_var and htmlentities on all user requests.
+ *
+ * @param string $name the post variable name
+ * @param string $filter the filter function to call
+ */
+function getRequest($name = '', $filter = FILTER_SANITIZE_SPECIAL_CHARS) {
+	if(isset($_POST[$name])) {
+		$var = filter_var($_POST[$name], $filter);
+		return htmlentities($var);
+	}
+}
+/**
+ * write file
+ * creates a blog of a give paste on the server.
+ *
+ * @param int $ttl time to live
+ * @param string $data the file data to write
+ */
+function writeFile($ttl, $data) {
+
 }
 //___________________________________________________________________________________________
 //                                                                                  rendering
