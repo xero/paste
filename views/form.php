@@ -7,7 +7,6 @@
 		<option value="3">1 day</option>
 		<option value="2">1 month</option>
 		<option value="1">1 year</option>
-		<option value="0">never</option>
 	</select>
 	<br class="clear"/>
 	<textarea name="data"></textarea>

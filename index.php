@@ -145,9 +145,27 @@ function URLlogic($url) {
 			$ttl = getRequest('ttl', FILTER_SANITIZE_NUMBER_INT);
 			$data = getRequest('data', FILTER_SANITIZE_SPECIAL_CHARS);
 			/**
-			 * @todo decide how to encode file w/ ttl and data, encrypt, save, generate url, and respond.
+			 * @todo encrypt the data
 			 */
-			$form = render('paste', array('url' => DOMAIN.'new/', 'paste' => 'coming soon...'), true);
+			switch (intval($ttl)) {
+				case 1:
+					$ttl = time()+365*24*60*60;
+				break;
+				case 2:
+					$ttl = time()+30*24*60*60;
+				break;
+				case 3:
+					$ttl = time()+24*60*60;
+				break;
+				case 4:
+					$ttl = time()+60*60;
+				break;
+				case 5:
+					$ttl = time();
+				break;
+			}
+			$name = writeFile($ttl, $data);
+			$form = render('paste', array('url' => DOMAIN.'new/', 'paste' => DOMAIN.$name), true);
 			render('template', array('body' => $form));
 		} else {
 			throw new Exception("Invalid URL", 404);
@@ -171,13 +189,22 @@ function getRequest($name = '', $filter = FILTER_SANITIZE_SPECIAL_CHARS) {
 }
 /**
  * write file
- * creates a blog of a give paste on the server.
+ * creates a json encoded blob of a given paste on the server.
  *
  * @param int $ttl time to live
  * @param string $data the file data to write
  */
 function writeFile($ttl, $data) {
-
+	$contents = array('ttl' => $ttl, 'data' => $data);
+	$json = json_encode($contents);
+	$filename = sha1($json);
+	while(file_exists(BLOBS.$filename)) {
+		$contents['random'] = rand();
+		$json = json_encode($contents);
+		$filename = sha1($json);		
+	}
+	file_put_contents(BLOBS.$filename, $json);
+	return $filename;
 }
 //___________________________________________________________________________________________
 //                                                                                  rendering
