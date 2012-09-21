@@ -161,14 +161,41 @@ function URLlogic($url) {
 					$ttl = time()+60*60;
 				break;
 				case 5:
-					$ttl = time();
+					$ttl = '0';
 				break;
 			}
-			$name = writeFile($ttl, $data);
-			$form = render('paste', array('url' => DOMAIN.'new/', 'paste' => DOMAIN.$name), true);
+			$key = sha1('this is the super secret decryption key!');
+			$name = writeFile($ttl, encrypt($key, $data));
+			$form = render('paste', array('url' => DOMAIN.'new/', 'paste' => DOMAIN.$name.'/'.$key), true);
 			render('template', array('body' => $form));
 		} else {
-			throw new Exception("Invalid URL", 404);
+			//---check file
+			if(!isset($url[1])) {
+				throw new Exception("Invalid URL", 404);
+			} else {
+				if(!file_exists(BLOBS.$url[0])) {
+					throw new Exception("Invalid URL", 404);
+				} else {
+					$contents = readTheFile($url[0]);
+					if($contents['ttl'] == intval(0)) {
+						//---decrypt and destroy
+						$cleartext = decrypt($url[1], $contents['data']);
+						$form = render('paste', array('url' => DOMAIN.'new/', 'paste' => $cleartext), true);
+						render('template', array('body' => $form));						
+						unlink(BLOBS.$url[0]);
+					} else if($contents['ttl'] < time()) {
+						//---too old, destroy
+						unlink(BLOBS.$url[0]);
+						throw new Exception("Invalid URL", 404);
+					} else {
+						//---decrypt and die
+						$cleartext = decrypt($url[1], $contents['data']);
+						$form = render('paste', array('url' => DOMAIN.'new/', 'paste' => $cleartext), true);
+						render('template', array('body' => $form));						
+						die();
+					}
+				}
+			}
 		}
 	}
 }
@@ -193,6 +220,7 @@ function getRequest($name = '', $filter = FILTER_SANITIZE_SPECIAL_CHARS) {
  *
  * @param int $ttl time to live
  * @param string $data the file data to write
+ * @return string the filename
  */
 function writeFile($ttl, $data) {
 	$contents = array('ttl' => $ttl, 'data' => $data);
@@ -205,6 +233,41 @@ function writeFile($ttl, $data) {
 	}
 	file_put_contents(BLOBS.$filename, $json);
 	return $filename;
+}
+/**
+ * read file
+ * reads and json decodes the data from a paste file on the server to an array
+ *
+ * @param string $name the filename
+ * @return array the file contents
+ */
+function readTheFile($name) {
+	$contents = file_get_contents(BLOBS.$name);
+	return json_decode($contents, true);
+}
+//___________________________________________________________________________________________
+//                                                                               cryptography
+/**
+ * encrypt function
+ * securly encrypts a string
+ *
+ * @param string $key the encryption key
+ * @param string $cleartext the string to be encrypted
+ * @return string encrypted string
+ */
+function encrypt($key, $cleartext) {
+	return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, md5($key), $cleartext, MCRYPT_MODE_CBC, md5($key)));
+}
+/**
+ * decrypt function
+ * securly decrypts a string
+ *
+ * @param string $key the encryption key
+ * @param string $encrypted the encrypted string
+ * @return string clear text
+ */
+function decrypt($key, $encrypted) {
+	return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($key), base64_decode($encrypted), MCRYPT_MODE_CBC, md5($key)), "\0");
 }
 //___________________________________________________________________________________________
 //                                                                                  rendering
