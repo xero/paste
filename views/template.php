@@ -12,6 +12,13 @@
 				color: #fff;
 				font-family: arial, helvetica, clean, sans-serif;
 			}
+			a, a:visited {
+				color: #ccc;
+				text-decoration: none;
+			}
+			a:hover {
+				border-bottom: 1px solid #333;
+			}
 			.clear {
 				clear: both;
 			}
@@ -69,6 +76,17 @@
 				color: #fff;
 				padding: 10px;
 			}
+			#viewPaste a, #viewPaste a:visited {
+				color: #fff;
+				text-decoration: none;
+			}
+			#viewPaste a:hover {
+				border-bottom: 1px solid #ccc;
+			}
+			#footer {
+				float: right;
+				margin: 10px 10px 0px 0px;
+			}			
 		</style>
 	</head>
 	<body>
@@ -81,5 +99,7 @@
 		<div id="content">
 			<? echo $body; ?>
 		</div>
+		<br class="clear"/>
+		<div id="footer">download the code:&nbsp;<a href="http://code.xero.nu/paste">xero.nu</a>&nbsp;/&nbsp;<a href="https://github.com/fontvirus/paste">github</a></div>
 	</body>
 </html>

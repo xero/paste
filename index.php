@@ -1,4 +1,20 @@
 <?php
+/**
+ * paste
+ * a simple web application for storing text online. all data stored on the sever is encrypted. 
+ * and when creating a paste, the user is provided with the only decryption key via sharing url. 
+ * if the url is lost so is the decryption key. keys are not stored on the server. 
+ * this keeps liability down for the server admin, and security up for the users. 
+ * urls are not listed or indexed, so search engines (and hackers) cannot spider them.
+ *
+ * public git repos:
+ *      http://code.xero.nu/paste.git
+ *      http://github.com/fontvirus/paste.git
+ *
+ * @author xero harrison <x@xero.nu>
+ * @copyright (cc) creative commons - attribution-shareAlike 3.0 unported
+ * @version 1.0
+ */
 bootstrap();
 //___________________________________________________________________________________________
 //                                                                          app configuration
@@ -7,7 +23,7 @@ bootstrap();
  * sets the default constant variables and sets up error/exception handling.
  */
 function config() {
-	define("VERSION",			"0.0");
+	define("VERSION",			"1.0");
 	define("FORCE_DIRTY",		true);
 	define("DEBUG",				true);
 	define("SLASH",				DIRECTORY_SEPARATOR);
