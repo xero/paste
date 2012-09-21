@@ -164,9 +164,10 @@ function URLlogic($url) {
 					$ttl = '0';
 				break;
 			}
-			$key = sha1('this is the super secret decryption key!');
+			$key = sha1(generateKey());
 			$name = writeFile($ttl, encrypt($key, $data));
-			$form = render('paste', array('url' => DOMAIN.'new/', 'paste' => DOMAIN.$name.'/'.$key), true);
+			$pasteURL = DOMAIN.$name.'/'.$key;
+			$form = render('paste', array('url' => DOMAIN.'new/', 'paste' => '<a href="'.$pasteURL.'">'.$pasteURL.'</a>'), true);
 			render('template', array('body' => $form));
 		} else {
 			//---check file
@@ -247,6 +248,23 @@ function readTheFile($name) {
 }
 //___________________________________________________________________________________________
 //                                                                               cryptography
+/**
+ * generate key
+ * creates a randomized, random length key
+ *
+ * @return string randomly generated key
+ */
+function generateKey() {
+	$charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+	$keylen = mt_rand(64, 128);
+	$key = '';
+	$i = 0;
+	while (++$i < $keylen) {
+		mt_srand((double) microtime()*rand());
+		$key .=  $charset[mt_rand(0, strlen($charset)-1)];
+	}
+	return $key;
+}
 /**
  * encrypt function
  * securly encrypts a string
