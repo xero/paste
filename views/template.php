@@ -100,6 +100,6 @@
 			<? echo $body; ?>
 		</div>
 		<br class="clear"/>
-		<div id="footer">download the code:&nbsp;<a href="http://code.xero.nu/paste">xero.nu</a>&nbsp;/&nbsp;<a href="https://github.com/fontvirus/paste">github</a></div>
+		<div id="footer">download the code:&nbsp;<a href="http://code.xero.nu/paste">xero.nu</a>&nbsp;/&nbsp;<a href="https://github.com/xero/paste">github</a></div>
 	</body>
 </html>
