@@ -3,4 +3,6 @@ paste is a simple web application for storing text online. all data stored on th
 install notes:
 - make sure the /blobs/ directory is writable.
 
-mirror :: http://code.xero.nu/paste
+demo   :: http://lab.xero.nu/paste
+code   :: http://code.xero.nu/paste
+mirror :: http://github.com/xero/paste
